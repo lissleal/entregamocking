@@ -28,3 +28,9 @@ npm start
 # Ruta para generar mocking
 
 http://localhost:8080/mockingProducts
+
+# Diccionario de Errores
+
+Se creó diccionario en archivo errors.config con sus respectivas funciones para manejar los errores
+
+#
