@@ -1,6 +1,7 @@
 import ProductService from '../services/ProductService.js';
 const productService = new ProductService();
 
+
 export async function getProducts(req, res) {
     //no se si esta bien la aplicacion de limit
     try {
@@ -49,6 +50,7 @@ export async function getProductById(req, res) {
         res.status(500).json({ error: 'Error al obtener el producto' });
     }
 }
+
 export async function createProduct(req, res) {
     try {
         let { name, description, price, category, stock, thumbnail } = req.body;
@@ -164,5 +166,8 @@ export async function getProductMaster(req, res) {
         console.error('Error al obtener los productos por query:', error);
         res.status(500).json({ error: 'Error al obtener los productos por query' });
     }
+
 }
+
+
 

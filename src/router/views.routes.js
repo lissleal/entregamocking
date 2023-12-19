@@ -1,5 +1,6 @@
 import express from "express";
 import authorizeRole from "../config/auth.config.js";
+import { createFakeProducts } from "../config/faker.config.js";
 
 
 const ViewsRouter = express.Router()
@@ -29,5 +30,16 @@ ViewsRouter.get("/addProducts", authorizeRole("admin"), (req, res) => {
         title: "Agregar Productos"
     })
 })
+
+ViewsRouter.get("/mockingProducts", async (req, res) => {
+    let products = await createFakeProducts()
+    res.render("mockingProducts", {
+        title: "Agregar Productos",
+        products: products
+    })
+})
+
+
+
 
 export default ViewsRouter

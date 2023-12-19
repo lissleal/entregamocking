@@ -2,6 +2,8 @@ import path from "path"
 import { fileURLToPath } from "url"
 import bcrypt from "bcrypt"
 
+
+//Funciones para encriptar y desencriptar contraseñas
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10))
 export const isValidPassword = (user, password) => {
     try {
@@ -13,6 +15,8 @@ export const isValidPassword = (user, password) => {
         return false;
     }
 }
+
+
 
 //Configuracion para handlebars
 const __filename = fileURLToPath(import.meta.url)
