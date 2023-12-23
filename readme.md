@@ -7,7 +7,6 @@ API para un ecommerce de libros
 - Aplicar modulo de mocking de productos
 - Aplicar customizador de errores
 - Aplicar diccionario de errores mas comunes
-- Modificar la paginacion actual, usar paginate
 
 ## Iniciar el Proyecto
 
@@ -28,7 +27,6 @@ npm install
     "express-session": "^1.17.3",
     "mongodb-connection-string-url": "^3.0.0",
     "mongoose": "^6.10.0",
-    "mongoose-paginate-v2": "^1.7.4",
     "multer": "^1.4.5-lts.1",
     "passport": "^0.6.0",
     "passport-github2": "^0.1.12",
