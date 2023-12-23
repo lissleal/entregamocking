@@ -1,23 +1,36 @@
 import ProductService from '../services/ProductService.js';
+import ProductDTO from '../dao/DTOs/product.dto.js';
+import UserDTO from '../dao/DTOs/user.dto.js';
 const productService = new ProductService();
 
 
 export async function getProducts(req, res) {
-    //no se si esta bien la aplicacion de limit
     try {
         if (!req.session.email) {
             return res.redirect("/login")
 
         }
         let limit = parseInt(req.query.limit) || 10;
-        let allProducts = await productService.getProducts(limit);
-        allProducts = allProducts.map(product => product.toJSON())
-        const userData = {
-            name: req.session.name,
-            surname: req.session.surname,
-            email: req.session.email,
-            role: req.session.role
+        let page = parseInt(req.query.page) || 1;
+        let sort = req.query.sort || "asc";
+        let query = req.query.query || {};
+        let allProducts = await productService.getProducts(limit, page, sort, query);
+
+        if (!allProducts) {
+            return next(
+                CustomError.createError({
+                    statusCode: 404,
+                    causeKey: "PRODUCTS_NOT_FOUND",
+                    message: "No se encontraron productos"
+                })
+            )
         }
+
+        allProducts = allProducts.docs.map(product => new ProductDTO(product))
+        console.log("El usuario es:", req.session.user)
+        let { name, email, role } = req.session.user
+        const userData = new UserDTO({ name, email, role })
+        console.log("El userData es:", userData)
 
         res.render("home", {
             title: "Segunda Pre Entrega",
@@ -38,7 +51,13 @@ export async function getProductById(req, res) {
         const prod = await productService.getProductById(prodId);
 
         if (!prod) {
-            return res.status(404).json({ error: 'Product not found' });
+            return next(
+                CustomError.createError({
+                    statusCode: 404,
+                    causeKey: "PRODUCT_NOT_FOUND",
+                    message: "No se encontró el producto"
+                })
+            )
         }
         const productDetail = prod.toObject();
         res.render("prod", {
@@ -57,7 +76,13 @@ export async function createProduct(req, res) {
         console.log("El body es:", req.body)
 
         if (!name || !description || !price || !category || !stock || !thumbnail) {
-            return res.send({ status: "error", error: "Incomplete values" })
+            return next(
+                CustomError.createError({
+                    statusCode: 404,
+                    causeKey: "PRODUCT_NOT_CREATED",
+                    message: "El producto no se ha podido crear"
+                })
+            )
         }
         let result = await productService.addProduct({
             name,
@@ -81,7 +106,13 @@ export async function updateProduct(req, res) {
         //esta bien llamado? esta diferente del de createProduct
         let productToReplace = req.body;
         if (!productToReplace.name || !productToReplace.description || !productToReplace.price || !productToReplace.category || !productToReplace.stock || !productToReplace.thumbnail) {
-            return res.send({ status: "error", error: "Incomplete values" })
+            return next(
+                CustomError.createError({
+                    statusCode: 404,
+                    causeKey: "PRODUCT_NOT_UPDATED",
+                    message: "El producto no se ha podido actualizar"
+                })
+            )
         }
         let result = await productService.updateProduct(pid, productToReplace);
         res.send({ result: "success", payload: result })
@@ -95,78 +126,20 @@ export async function deleteProduct(req, res) {
     try {
         let { pid } = req.params;
         let result = await productService.deleteProduct(pid);
+        if (!result) {
+            return next(
+                CustomError.createError({
+                    statusCode: 404,
+                    causeKey: "PRODUCT_NOT_DELETED",
+                    message: "El producto no se ha podido eliminar"
+                })
+            )
+        }
         res.send({ result: "success", payload: result })
     } catch (error) {
         console.error('Error al eliminar el producto:', error);
         res.status(500).json({ error: 'Error al eliminar el producto' });
     }
-}
-
-export async function getProductByLimit(req, res) {
-    try {
-        let limit = parseInt(req.params.limit)
-        if (isNaN(limit) || limit <= 0) {
-            limit = 10
-        } res.send(await productService.getProductByLimit(limit))
-    } catch (error) {
-        console.error('Error al obtener los productos por limit:', error);
-        res.status(500).json({ error: 'Error al obtener los productos por limit' });
-    }
-}
-
-export async function getProductByPage(req, res) {
-    try {
-        let page = parseInt(req.params.page)
-        if (isNaN(page) || page <= 0) {
-            page = 1
-        }
-        const productsPerPage = 1
-        res.send(await productService.getProductByPage(page, productsPerPage))
-    } catch (error) {
-        console.error('Error al obtener los productos por pagina:', error);
-        res.status(500).json({ error: 'Error al obtener los productos por pagina' });
-    }
-}
-
-export async function getProductByQuery(req, res) {
-    try {
-        let query = req.params.query
-        res.send(await productService.getProductByQuery(query))
-    } catch (error) {
-        console.error('Error al obtener los productos por query:', error);
-        res.status(500).json({ error: 'Error al obtener los productos por query' });
-    }
-
-}
-
-export async function getProductMaster(req, res) {
-    try {
-        let page = parseInt(req.params.page)
-        let limit = parseInt(req.params.limit)
-        let category = req.params.category
-        let availability = req.params.availability
-        let sortOrder = req.params.sortOrder
-        if (isNaN(page) || page <= 0) {
-            page = 1
-        }
-        if (isNaN(limit) || limit <= 0) {
-            limit = 10
-        }
-        if (!category) {
-            category = ''
-        }
-        if (!availability) {
-            availability = ''
-        }
-        if (!sortOrder) {
-            sortOrder = ''
-        }
-        res.send(await productService.getProductMaster(page, limit, category, availability, sortOrder))
-    } catch (error) {
-        console.error('Error al obtener los productos por query:', error);
-        res.status(500).json({ error: 'Error al obtener los productos por query' });
-    }
-
 }
 
 

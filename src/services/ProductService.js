@@ -5,9 +5,9 @@ class ProductService {
         this.productRepository = new ProductRepository();
     }
 
-    getProducts = async (limit) => {
+    getProducts = async (limit, page, sort, query) => {
         try {
-            const products = await this.productRepository.getProducts(limit);
+            const products = await this.productRepository.getProducts(limit, page, sort, query);
             return products;
         } catch (error) {
             console.error('Error al buscar los productos:', error);
@@ -59,45 +59,7 @@ class ProductService {
         }
     }
 
-    getProductByLimit = async (limit) => {
-        try {
-            const products = await this.productRepository.getProductByLimit(limit);
-            return products;
-        } catch (error) {
-            console.error('Error al buscar los productos:', error);
-            return null;
-        }
-    }
 
-    getProductByPage = async (page) => {
-        try {
-            const products = await this.productRepository.getProductByPage(page);
-            return products;
-        } catch (error) {
-            console.error('Error al buscar los productos:', error);
-            return null;
-        }
-    }
-
-    getProductByQuery = async (query) => {
-        try {
-            const products = await this.productRepository.getProductByQuery(query);
-            return products;
-        } catch (error) {
-            console.error('Error al buscar los productos:', error);
-            return null;
-        }
-    }
-
-    getProductMaster = async (page, limit, category, availability, sortOrder) => {
-        try {
-            const products = await this.productRepository.getProductMaster(page, limit, category, availability, sortOrder);
-            return products;
-        } catch (error) {
-            console.error('Error al buscar los productos:', error);
-            return null;
-        }
-    }
 }
 
 export default ProductService

@@ -4,8 +4,13 @@ export async function registerUser(req, res) {
         console.log("Registering user...");
         const { name, surname, email, password, role } = req.body;
         if (!name || !surname || !email || !password || !role) {
-            console.log("Faltan datos");
-            res.status(400).send("Faltan datos");
+            return next(
+                CustomError.createError({
+                    statusCode: 404,
+                    causeKey: USER_NOT_CREATED,
+                    message: "El usuario no se ha podido crear"
+                })
+            )
         }
         res.redirect("/login");
     } catch (error) { res.status(500).send("Error al registrar usuario: " + error.message); }
